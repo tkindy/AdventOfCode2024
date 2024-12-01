@@ -19,3 +19,7 @@
 (deftest part1
   (is (= (day01/part1 example)
          11)))
+
+(deftest part2
+  (is (= (day01/part2 example)
+         31)))
