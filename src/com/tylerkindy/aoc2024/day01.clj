@@ -20,9 +20,7 @@
 
 (defn build-occurrences [list]
   (reduce (fn [occurrences elem]
-            (update occurrences elem #(if (nil? %)
-                                        1
-                                        (inc %))))
+            (update occurrences elem #(inc (or % 0))))
           {}
           list))
 
