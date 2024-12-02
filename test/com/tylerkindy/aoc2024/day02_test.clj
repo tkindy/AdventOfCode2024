@@ -39,3 +39,7 @@
 (deftest part1
   (is (= (day02/part1 example)
          2)))
+
+(deftest part2
+  (is (= (day02/part2 example)
+         4)))

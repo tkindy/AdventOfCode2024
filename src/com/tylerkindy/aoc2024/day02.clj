@@ -27,16 +27,38 @@
              (<= 1 delta 3))
           deltas))
 
-(defn safe? [deltas]
+(defn safe-deltas? [deltas]
   (and (all-same-sign? deltas)
        (all-within-range? deltas)))
 
+(defn safe? [report]
+  (-> report
+      deltas
+      safe-deltas?))
+
 (defn part1 [reports]
   (->> reports
-       (map deltas)
        (filter safe?)
+       count))
+
+(defn dampened-candidates [report]
+  (let [len (count report)
+        all-dampened (map (fn [i] (concat (take i report)
+                                          (take-last (- len i 1) report)))
+                          (range len))]
+    (conj all-dampened report)))
+
+(defn safe-dampened? [report]
+  (->> report
+       dampened-candidates
+       (some safe?)))
+
+(defn part2 [reports]
+  (->> reports
+       (filter safe-dampened?)
        count))
 
 (defn -main []
   (let [reports (parse-input (slurp "input/day02.txt"))]
-    (println "Part 1:" (part1 reports))))
+    (println "Part 1:" (part1 reports))
+    (println "Part 2:" (part2 reports))))
