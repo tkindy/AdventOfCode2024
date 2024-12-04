@@ -27,3 +27,18 @@ MXMXAXMASX
 (deftest parse-input
   (is (= (day04/parse-input example-input)
          example)))
+
+(deftest all-coordinates
+  (is (= (day04/all-coordinates [[\A \B \C]
+                                 [\D \E \F]])
+         #{[0 0] [1 0] [2 0]
+           [0 1] [1 1] [2 1]})))
+
+(deftest neighbors
+  (is (= (day04/neighbors [0 1] #{[0 0] [1 0] [2 0]
+                                  [0 1] [1 1] [2 1]})
+         #{[0 0] [1 0] [1 1]})))
+
+(deftest part1
+  (is (= (day04/part1 example)
+         18)))
