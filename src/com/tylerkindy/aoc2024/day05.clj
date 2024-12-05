@@ -31,8 +31,29 @@
     {:before-rules (parse-rules rules)
      :updates (parse-updates updates)}))
 
-(defn part1 [input]
-  0)
+(defn before-pairs [update]
+  (->> (for [i (range (count update))]
+         (for [j (range (inc i) (count update))]
+           [(get update i) (get update j)]))
+       (apply concat)))
+
+(defn ordered-pair? [[before after] before-rules]
+  (contains? (before-rules before) after))
+
+(defn ordered? [update before-rules]
+  (->> update
+       before-pairs
+       (every? (fn [pair]
+                 (ordered-pair? pair before-rules)))))
+
+(defn middle-page [update]
+  (get update (quot (count update) 2)))
+
+(defn part1 [{:keys [before-rules updates]}]
+  (->> updates
+       (filter #(ordered? % before-rules))
+       (map middle-page)
+       (apply +)))
 
 (defn -main []
   (let [input (parse-input (slurp "input/day05.txt"))]
