@@ -15,9 +15,9 @@
        (into #{})))
 
 (defn lookup [[x y] puzzle]
-  (-> puzzle
-      (get y)
-      (get x)))
+  (some-> puzzle
+          (get y)
+          (get x)))
 
 (defn neighbors [coord all-coordinates]
   (->> (for [dx (range -1 2)
@@ -56,9 +56,18 @@
        (map #(lookup % puzzle))
        frequencies))
 
+(defn cross-words [coord puzzle all-coordinates]
+  (->> [[[-1 -1] [1 1]] [[-1 1] [1 -1]]]
+       (map (fn [deltas]
+              (->> deltas
+                   (map (fn [delta]
+                          (lookup (v/+ coord delta) puzzle)))
+                   sort)))
+       (into #{})))
+
 (defn x-mases-from [coord puzzle all-coordinates]
   (letfn [(check-x-mas [coord]
-            (= (corner-values coord puzzle all-coordinates) {\M 2, \S 2}))]
+            (= (cross-words coord puzzle all-coordinates) #{[\M \S]}))]
     (if (and (= \A (lookup coord puzzle))
              (check-x-mas coord))
       1
