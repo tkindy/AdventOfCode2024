@@ -35,9 +35,10 @@ MXMXAXMASX
            [0 1] [1 1] [2 1]})))
 
 (deftest neighbors
-  (is (= (day04/neighbors [0 1] #{[0 0] [1 0] [2 0]
-                                  [0 1] [1 1] [2 1]})
-         #{[0 0] [1 0] [1 1]})))
+  (is (= (day04/neighbors [0 1])
+         #{[-1 0] [0 0] [1 0]
+           [-1 1]       [1 1]
+           [-1 2] [0 2] [1 2]})))
 
 (deftest part1
   (is (= (day04/part1 example)

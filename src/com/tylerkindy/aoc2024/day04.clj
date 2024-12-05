@@ -19,21 +19,20 @@
           (get y)
           (get x)))
 
-(defn neighbors [coord all-coordinates]
+(defn neighbors [coord]
   (->> (for [dx (range -1 2)
              dy (range -1 2)]
          (v/+ coord [dx dy]))
-       (filter #(and (all-coordinates %)
-                     (not= coord %)))
+       (filter (partial not= coord))
        (into #{})))
 
 (defn find-matches [puzzle pred]
-  (let [all-coordinates (all-coordinates puzzle)]
-    (->> all-coordinates
-         (map #(pred % puzzle all-coordinates))
-         (apply +))))
+  (->> puzzle
+       all-coordinates
+       (map #(pred % puzzle))
+       (apply +)))
 
-(defn xmases-from [coord puzzle all-coordinates]
+(defn xmases-from [coord puzzle]
   (letfn [(help [coord to-match dir]
             (if (= (first to-match) (lookup coord puzzle))
               (if (empty? (rest to-match))
@@ -41,7 +40,7 @@
                 (help (v/+ coord dir) (rest to-match) dir))
               0))]
     (if (= \X (lookup coord puzzle))
-      (->> (neighbors coord all-coordinates)
+      (->> (neighbors coord)
            (map #(help % "MAS" (v/- % coord)))
            (apply +))
       0)))
@@ -49,7 +48,7 @@
 (defn part1 [puzzle]
   (find-matches puzzle xmases-from))
 
-(defn cross-words [coord puzzle all-coordinates]
+(defn cross-words [coord puzzle]
   (->> [[[-1 -1] [1 1]] [[-1 1] [1 -1]]]
        (map (fn [deltas]
               (->> deltas
@@ -58,9 +57,9 @@
                    sort)))
        (into #{})))
 
-(defn x-mases-from [coord puzzle all-coordinates]
+(defn x-mases-from [coord puzzle]
   (letfn [(check-x-mas [coord]
-            (= (cross-words coord puzzle all-coordinates) #{[\M \S]}))]
+            (= (cross-words coord puzzle) #{[\M \S]}))]
     (if (and (= \A (lookup coord puzzle))
              (check-x-mas coord))
       1
