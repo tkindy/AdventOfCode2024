@@ -49,13 +49,6 @@
 (defn part1 [puzzle]
   (find-matches puzzle xmases-from))
 
-(defn corner-values [coord puzzle all-coordinates]
-  (->> (list [-1 -1] [1 -1] [-1 1] [1 1])
-       (map (partial v/+ coord))
-       (filter all-coordinates)
-       (map #(lookup % puzzle))
-       frequencies))
-
 (defn cross-words [coord puzzle all-coordinates]
   (->> [[[-1 -1] [1 1]] [[-1 1] [1 -1]]]
        (map (fn [deltas]
