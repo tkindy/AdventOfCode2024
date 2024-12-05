@@ -42,3 +42,14 @@ MXMXAXMASX
 (deftest part1
   (is (= (day04/part1 example)
          18)))
+
+(deftest corner-values
+  (let [puzzle [[\A \B \C]
+                [\D \E \F]
+                [\G \H \I]]]
+    (is (= (day04/corner-values [1 1] puzzle (day04/all-coordinates puzzle))
+           {\A 1, \C 1, \G 1, \I 1}))))
+
+(deftest part2
+  (is (= (day04/part2 example)
+         9)))

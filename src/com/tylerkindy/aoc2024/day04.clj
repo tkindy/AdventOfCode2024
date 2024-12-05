@@ -27,7 +27,13 @@
                      (not= coord %)))
        (into #{})))
 
-(defn matches-from [coord puzzle all-coordinates]
+(defn find-matches [puzzle pred]
+  (let [all-coordinates (all-coordinates puzzle)]
+    (->> all-coordinates
+         (map #(pred % puzzle all-coordinates))
+         (apply +))))
+
+(defn xmases-from [coord puzzle all-coordinates]
   (letfn [(help [coord to-match dir]
             (if (= (first to-match) (lookup coord puzzle))
               (if (empty? (rest to-match))
@@ -41,11 +47,27 @@
       0)))
 
 (defn part1 [puzzle]
-  (let [all-coordinates (all-coordinates puzzle)]
-    (->> all-coordinates
-         (map #(matches-from % puzzle all-coordinates))
-         (apply +))))
+  (find-matches puzzle xmases-from))
+
+(defn corner-values [coord puzzle all-coordinates]
+  (->> (list [-1 -1] [1 -1] [-1 1] [1 1])
+       (map (partial v/+ coord))
+       (filter all-coordinates)
+       (map #(lookup % puzzle))
+       frequencies))
+
+(defn x-mases-from [coord puzzle all-coordinates]
+  (letfn [(check-x-mas [coord]
+            (= (corner-values coord puzzle all-coordinates) {\M 2, \S 2}))]
+    (if (and (= \A (lookup coord puzzle))
+             (check-x-mas coord))
+      1
+      0)))
+
+(defn part2 [puzzle]
+  (find-matches puzzle x-mases-from))
 
 (defn -main []
   (let [puzzle (parse-input (slurp "input/day04.txt"))]
-    (println "Part 1:" (part1 puzzle))))
+    (println "Part 1:" (part1 puzzle))
+    (println "Part 2:" (part2 puzzle))))
