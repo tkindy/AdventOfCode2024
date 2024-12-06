@@ -22,3 +22,7 @@
 (deftest parse-input
   (is (= (day06/parse-input example-input)
          example)))
+
+(deftest part1
+  (is (= (day06/part1 example)
+         41)))
