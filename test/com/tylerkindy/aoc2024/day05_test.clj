@@ -1,6 +1,7 @@
 (ns com.tylerkindy.aoc2024.day05-test
   (:require [com.tylerkindy.aoc2024.day05 :as day05]
-            [clojure.test :refer [deftest is]]))
+            [clojure.test :refer [deftest is]])
+  (:refer-clojure :exclude [sort]))
 
 (def example-input "47|53
 97|13
@@ -70,3 +71,15 @@
 (deftest part1
   (is (= (day05/part1 example)
          143)))
+
+(deftest sort
+  (is (= (day05/sort [75 97 47 61 53] (example :before-rules))
+         [97 75 47 61 53]))
+  (is (= (day05/sort [61 13 29] (example :before-rules))
+         [61 29 13]))
+  (is (= (day05/sort [97 13 75 29 47] (example :before-rules))
+         [97 75 47 29 13])))
+
+(deftest part2
+  (is (= (day05/part2 example)
+         123)))

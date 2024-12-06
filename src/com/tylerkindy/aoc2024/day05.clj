@@ -1,5 +1,7 @@
 (ns com.tylerkindy.aoc2024.day05
-  (:require [clojure.string :as str]))
+  (:require [clojure.core :as core]
+            [clojure.string :as str])
+  (:refer-clojure :exclude [sort]))
 
 (defn parse-rule [rule]
   (->> rule
@@ -47,7 +49,7 @@
                  (ordered-pair? pair before-rules)))))
 
 (defn middle-page [update]
-  (get update (quot (count update) 2)))
+  (nth update (quot (count update) 2)))
 
 (defn part1 [{:keys [before-rules updates]}]
   (->> updates
@@ -55,6 +57,23 @@
        (map middle-page)
        (apply +)))
 
+(defn sort [update before-rules]
+  (->> update
+       (map (fn [page]
+              [page (or (before-rules page) #{})]))
+       (core/sort (comparator (fn [[l l-rules] [r r-rules]]
+                                (or (contains? l-rules r)
+                                    (not (contains? r-rules l))))))
+       (map first)))
+
+(defn part2 [{:keys [before-rules updates]}]
+  (->> updates
+       (filter #(not (ordered? % before-rules)))
+       (map #(sort % before-rules))
+       (map middle-page)
+       (apply +)))
+
 (defn -main []
   (let [input (parse-input (slurp "input/day05.txt"))]
-    (println "Part 1:" (part1 input))))
+    (println "Part 1:" (part1 input))
+    (println "Part 2:" (part2 input))))
