@@ -20,6 +20,13 @@
               v)
       (assoc v :dimensions [(count (first lines)) (count lines)]))))
 
+(defn next-dir [dir]
+  (condp = dir
+    [0 -1] [1 0]
+    [1 0] [0 1]
+    [0 1] [-1 0]
+    [-1 0] [0 -1]))
+
 (defn build-path [{[width height] :dimensions
                    :keys [start obstacles]}]
   (letfn [(out-of-bounds? [[x y]]
@@ -27,12 +34,6 @@
                 (>= x width)
                 (< y 0)
                 (>= y height)))
-          (next-dir [dir]
-            (condp = dir
-              [0 -1] [1 0]
-              [1 0] [0 1]
-              [0 1] [-1 0]
-              [-1 0] [0 -1]))
           (move [loc dir]
             (let [attempted-loc (vec/+ loc dir)]
               (if (obstacles attempted-loc)
@@ -56,8 +57,43 @@
        all-positions
        count))
 
-(defn obstacle-candidates [info]
-  #{})
+(defn index-obstacles [obstacles]
+  (letfn [(build-index [key-fn val-fn]
+            (-> (group-by key-fn obstacles)
+                (update-vals #(->> %
+                                   (map val-fn)
+                                   sort
+                                   (into [])))))]
+    {:rows (build-index second first)
+     :columns (build-index first second)}))
+
+(defn guard->segment [[[x y] [dx _ :as dir]] obstacle-index]
+  (let [[index-key first-coord second-coord build-start]
+        (if (= dx 0)
+          [:columns x y (fn [y] [x y])]
+          [:rows y x (fn [x] [x y])])]
+    {:start (build-start (as-> (obstacle-index index-key) v
+                           (get v first-coord [])
+                           (take-while #(< % second-coord) v)
+                           (or (last v) -1)
+                           (inc v)))
+     :dir dir}))
+
+(defn could-loop? [[loc dir] segments obstacle-index]
+  (contains? segments
+             (guard->segment [loc (next-dir dir)] obstacle-index)))
+
+(defn obstacle-candidates [{:keys [obstacles] :as info}]
+  (let [obstacle-index (index-obstacles obstacles)]
+    (->> info
+         build-path
+         (reduce (fn [[candidates segments] [loc dir :as guard]]
+                   [(if (could-loop? guard segments obstacle-index)
+                      (conj candidates (vec/+ loc dir))
+                      candidates)
+                    (conj segments (guard->segment guard obstacle-index))])
+                 [#{} #{}])
+         first)))
 
 (defn part2 [info]
   (count (obstacle-candidates info)))
