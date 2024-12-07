@@ -26,3 +26,11 @@
 (deftest part1
   (is (= (day06/part1 example)
          41)))
+
+(deftest obstacle-candidates
+  (is (= (day06/obstacle-candidates example)
+         #{[3 6] [6 7] [7 7] [1 8] [3 8] [7 9]})))
+
+(deftest part2
+  (is (= (day06/part2 example)
+         6)))

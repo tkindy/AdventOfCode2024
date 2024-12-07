@@ -65,6 +65,13 @@
        all-positions
        count))
 
+(defn obstacle-candidates [info]
+  #{})
+
+(defn part2 [info]
+  (count (obstacle-candidates info)))
+
 (defn -main []
   (let [info (parse-input (slurp "input/day06.txt"))]
-    (println "Part 1:" (part1 info))))
+    (println "Part 1:" (part1 info))
+    (println "Part 2:" (part2 info))))
