@@ -41,13 +41,14 @@
           (help [[loc dir]]
             (if (out-of-bounds? loc)
               nil
-              (lazy-seq (cons loc
+              (lazy-seq (cons [loc dir]
                               (help (move loc dir))))))]
     (help [start [0 -1]])))
 
 (defn all-positions [info]
   (->> info
        build-path
+       (map first)
        (into #{})))
 
 (defn part1 [info]
