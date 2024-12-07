@@ -33,21 +33,11 @@
               [1 0] [0 1]
               [0 1] [-1 0]
               [-1 0] [0 -1]))
-          (dir-seq-help [dir]
-            (lazy-seq
-             (let [dir (next-dir dir)]
-               (cons dir
-                     (dir-seq-help dir)))))
-          (dir-seq [dir]
-            (cons dir (dir-seq-help dir)))
-          (candidates [loc dir]
-            (->> dir
-                 dir-seq
-                 (map (fn [dir] [(vec/+ loc dir) dir]))))
           (move [loc dir]
-            (->> (candidates loc dir)
-                 (filter (fn [[loc _]] (not (obstacles loc))))
-                 first))
+            (let [attempted-loc (vec/+ loc dir)]
+              (if (obstacles attempted-loc)
+                [loc (next-dir dir)]
+                [attempted-loc dir])))
           (help [[loc dir]]
             (if (out-of-bounds? loc)
               nil
