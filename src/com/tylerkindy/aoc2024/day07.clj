@@ -13,26 +13,39 @@
          str/split-lines
          (map parse-line))))
 
-(defn possible-results [operands]
+(defn possible-results [operands operators]
   (letfn [(help [acc operands]
             (if (empty? operands)
               [acc]
-              (concat (help (+ acc (first operands)) (rest operands))
-                      (help (* acc (first operands)) (rest operands)))))]
+              (apply concat
+                     (map (fn [operator]
+                            (help (operator acc (first operands))
+                                  (rest operands)))
+                          operators))))]
     (help (first operands) (rest operands))))
 
-(defn possibly-true? [{:keys [test-value operands]}]
-  (->> operands
-       possible-results
-       (some #(= test-value %))
-       boolean))
+(defn possibly-true? [{:keys [test-value operands]} operators]
+  (as-> operands v
+    (possible-results v operators)
+    (some #(= test-value %) v)
+    (boolean v)))
 
-(defn part1 [equations]
+(defn solve [equations operators]
   (->> equations
-       (filter possibly-true?)
+       (filter #(possibly-true? % operators))
        (map :test-value)
        (apply +)))
 
+(defn part1 [equations]
+  (solve equations [+ *]))
+
+(defn concat-op [l r]
+  (parse-long (str l r)))
+
+(defn part2 [equations]
+  (solve equations [+ * concat-op]))
+
 (defn -main []
   (let [equations (parse-input (slurp "input/day07.txt"))]
-    (println "Part 1:" (part1 equations))))
+    (println "Part 1:" (part1 equations))
+    (println "Part 2:" (part2 equations))))
