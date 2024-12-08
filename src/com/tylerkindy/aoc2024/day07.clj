@@ -13,5 +13,26 @@
          str/split-lines
          (map parse-line))))
 
+(defn possible-results [operands]
+  (letfn [(help [acc operands]
+            (if (empty? operands)
+              [acc]
+              (concat (help (+ acc (first operands)) (rest operands))
+                      (help (* acc (first operands)) (rest operands)))))]
+    (help (first operands) (rest operands))))
+
+(defn possibly-true? [{:keys [test-value operands]}]
+  (->> operands
+       possible-results
+       (some #(= test-value %))
+       boolean))
+
+(defn part1 [equations]
+  (->> equations
+       (filter possibly-true?)
+       (map :test-value)
+       (apply +)))
+
 (defn -main []
-  (let [equations (parse-input (slurp "input/day07.txt"))]))
+  (let [equations (parse-input (slurp "input/day07.txt"))]
+    (println "Part 1:" (part1 equations))))

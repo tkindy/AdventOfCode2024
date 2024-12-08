@@ -34,3 +34,19 @@
 (deftest parse-input
   (is (= (day07/parse-input example-input)
          example)))
+
+(deftest possible-results
+  (is (= (into #{} (day07/possible-results [10 19]))
+         #{29 190})))
+
+(deftest possibly-true?
+  (is (true? (day07/possibly-true? {:test-value 190
+                                    :operands [10 19]})))
+  (is (true? (day07/possibly-true? {:test-value 3267
+                                    :operands [81 40 27]})))
+  (is (false? (day07/possibly-true? {:test-value 83
+                                     :operands [17 5]}))))
+
+(deftest part1
+  (is (= (day07/part1 example)
+         3749)))
