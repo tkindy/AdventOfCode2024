@@ -28,41 +28,6 @@
   (is (= (day06/part1 example)
          41)))
 
-(def example-obstacles-index (day06/index-obstacles (example :obstacles)))
-
-(deftest index-obstacles
-  (is (= example-obstacles-index
-         {:rows {0 [4]
-                 1 [9]
-                 3 [2]
-                 4 [7]
-                 6 [1]
-                 7 [8]
-                 8 [0]
-                 9 [6]}
-          :columns {0 [8]
-                    1 [6]
-                    2 [3]
-                    4 [0]
-                    6 [9]
-                    7 [4]
-                    8 [7]
-                    9 [1]}})))
-
-(deftest guard->segment
-  (is (= (day06/guard->segment [(example :start) [0 -1]]
-                               example-obstacles-index)
-         {:start [4 1], :dir [0 -1]}))
-  (is (= (day06/guard->segment [[2 1] [0 1]]
-                               example-obstacles-index)
-         {:start [2 0], :dir [0 1]}))
-  (is (= (day06/guard->segment [[2 8] [0 1]]
-                               example-obstacles-index)
-         {:start [2 4], :dir [0 1]}))
-  (is (= (day06/guard->segment [[2 8] [1 0]]
-                               example-obstacles-index)
-         {:start [1 8], :dir [1 0]})))
-
 (defn parse-example [example]
   (-> example
       s/trim-indent

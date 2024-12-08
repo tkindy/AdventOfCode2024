@@ -57,45 +57,25 @@
        all-positions
        count))
 
-(defn index-obstacles [obstacles]
-  (letfn [(build-index [key-fn val-fn]
-            (-> (group-by key-fn obstacles)
-                (update-vals #(->> %
-                                   (map val-fn)
-                                   sort
-                                   (into [])))))]
-    {:rows (build-index second first)
-     :columns (build-index first second)}))
-
-(defn guard->segment [[[x y] [dx _ :as dir]] obstacle-index]
-  (let [[index-key first-coord second-coord build-start]
-        (if (= dx 0)
-          [:columns x y (fn [y] [x y])]
-          [:rows y x (fn [x] [x y])])]
-    {:start (build-start (as-> (obstacle-index index-key) v
-                           (get v first-coord [])
-                           (take-while #(< % second-coord) v)
-                           (or (last v) -1)
-                           (inc v)))
-     :dir dir}))
-
-(defn could-loop? [[loc dir] segments obstacle-index]
-  (contains? segments
-             (guard->segment [loc (next-dir dir)] obstacle-index)))
-
-(defn obstacle-candidates [{:keys [dimensions obstacles] :as info}]
-  (let [obstacle-index (index-obstacles obstacles)]
+(defn obstacle-candidates [{:keys [start dimensions] :as info}]
+  (letfn [(loops? [path]
+            (loop [path path
+                   visited #{}]
+              (and (seq path)
+                   (let [state (first path)]
+                     (or (visited state)
+                         (recur (rest path) (conj visited state)))))))]
     (->> info
          build-path
-         (reduce (fn [[candidates segments] [loc dir :as guard]]
-                   [(let [candidate (vec/+ loc dir)]
-                      (if (and (could-loop? guard segments obstacle-index)
-                               (not (out-of-bounds? candidate dimensions)))
-                        (conj candidates candidate)
-                        candidates))
-                    (conj segments (guard->segment guard obstacle-index))])
-                 [#{} #{}])
-         first)))
+         (map (fn [[loc dir :as guard]]
+                [guard (vec/+ loc dir)]))
+         (filter #(and (not (out-of-bounds? (nth % 1) dimensions))
+                       (not= (nth % 1) start)))
+         (map (fn [[_ new-obstacle]]
+                [new-obstacle (build-path (update info :obstacles conj new-obstacle))]))
+         (filter (comp loops? second))
+         (map first)
+         (into #{}))))
 
 (defn part2 [info]
   (count (obstacle-candidates info)))
