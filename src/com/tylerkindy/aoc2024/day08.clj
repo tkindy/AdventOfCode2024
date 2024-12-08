@@ -25,21 +25,11 @@
                         {}))}))
 
 (defn all-pairs [antennas]
-  (if (< (count antennas) 2)
-    #{}
-    (letfn [(help [l rs]
-              (->> rs
-                   (map (fn [r] #{l r}))
-                   (into #{})))]
-      (set/union (help (first antennas) (rest antennas))
-                 (all-pairs (rest antennas))))))
-
-(defn antinodes [pair]
-  (let [l (first pair)
-        r (second pair)
-        v (vec/- r l)]
-    #{(vec/- l v)
-      (vec/+ l (vec/* v 2))}))
+  (->> (for [l antennas, r antennas]
+         (when (not= l r)
+           [l r]))
+       (filter some?)
+       (into #{})))
 
 (defn in-bounds? [[x y] [width height]]
   (and (>= x 0)
@@ -47,17 +37,35 @@
        (>= y 0)
        (< y height)))
 
-(defn unique-antinodes [{:keys [dimensions antennas]}]
+(defn antinodes [[l r] generator dimensions]
+  (let [v (vec/- r l)]
+    (->> (generator l v)
+         (take-while #(in-bounds? % dimensions)))))
+
+(defn unique-antinodes [{:keys [dimensions antennas]} generator]
   (->> antennas
        vals
        (mapcat all-pairs)
-       (mapcat antinodes)
-       (filter #(in-bounds? % dimensions))
+       (mapcat #(antinodes % generator dimensions))
        (into #{})))
 
+(defn count-antinodes [world generator]
+  (count (unique-antinodes world generator)))
+
+(defn part1-generator [l v]
+  [(vec/+ l (vec/* v 2))])
+
 (defn part1 [world]
-  (count (unique-antinodes world)))
+  (count-antinodes world part1-generator))
+
+(defn part2-generator [l v]
+  (lazy-seq (cons l
+                  (part2-generator (vec/+ l v) v))))
+
+(defn part2 [world]
+  (count-antinodes world part2-generator))
 
 (defn -main []
   (let [world (parse-input (slurp "input/day08.txt"))]
-    (println "Part 1:" (part1 world))))
+    (println "Part 1:" (part1 world))
+    (println "Part 2:" (part2 world))))

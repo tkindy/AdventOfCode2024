@@ -25,12 +25,13 @@
 
 (deftest all-pairs
   (is (= (day08/all-pairs #{[8 1] [5 2] [7 3] [4 4]})
-         #{#{[8 1] [5 2]} #{[8 1] [7 3]} #{[8 1] [4 4]}
-           #{[5 2] [7 3]} #{[5 2] [4 4]}
-           #{[7 3] [4 4]}})))
+         #{[[8 1] [5 2]] [[8 1] [7 3]] [[8 1] [4 4]]
+           [[5 2] [8 1]] [[5 2] [7 3]] [[5 2] [4 4]]
+           [[7 3] [8 1]] [[7 3] [5 2]] [[7 3] [4 4]]
+           [[4 4] [8 1]] [[4 4] [5 2]] [[4 4] [7 3]]})))
 
 (deftest unique-antinodes
-  (is (= (day08/unique-antinodes example)
+  (is (= (day08/unique-antinodes example day08/part1-generator)
          #{[6 0] [11 0]
            [3 1]
            [4 2] [10 2]
@@ -45,3 +46,7 @@
 (deftest part1
   (is (= (day08/part1 example)
          14)))
+
+(deftest part2
+  (is (= (day08/part2 example)
+         34)))
