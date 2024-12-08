@@ -27,20 +27,20 @@
     [0 1] [-1 0]
     [-1 0] [0 -1]))
 
-(defn build-path [{[width height] :dimensions
-                   :keys [start obstacles]}]
-  (letfn [(out-of-bounds? [[x y]]
-            (or (< x 0)
-                (>= x width)
-                (< y 0)
-                (>= y height)))
-          (move [loc dir]
+(defn out-of-bounds? [[x y] [width height]]
+  (or (< x 0)
+      (>= x width)
+      (< y 0)
+      (>= y height)))
+
+(defn build-path [{:keys [dimensions start obstacles]}]
+  (letfn [(move [loc dir]
             (let [attempted-loc (vec/+ loc dir)]
               (if (obstacles attempted-loc)
                 [loc (next-dir dir)]
                 [attempted-loc dir])))
           (help [[loc dir]]
-            (if (out-of-bounds? loc)
+            (if (out-of-bounds? loc dimensions)
               nil
               (lazy-seq (cons [loc dir]
                               (help (move loc dir))))))]
@@ -83,14 +83,16 @@
   (contains? segments
              (guard->segment [loc (next-dir dir)] obstacle-index)))
 
-(defn obstacle-candidates [{:keys [obstacles] :as info}]
+(defn obstacle-candidates [{:keys [dimensions obstacles] :as info}]
   (let [obstacle-index (index-obstacles obstacles)]
     (->> info
          build-path
          (reduce (fn [[candidates segments] [loc dir :as guard]]
-                   [(if (could-loop? guard segments obstacle-index)
-                      (conj candidates (vec/+ loc dir))
-                      candidates)
+                   [(let [candidate (vec/+ loc dir)]
+                      (if (and (could-loop? guard segments obstacle-index)
+                               (not (out-of-bounds? candidate dimensions)))
+                        (conj candidates candidate)
+                        candidates))
                     (conj segments (guard->segment guard obstacle-index))])
                  [#{} #{}])
          first)))
