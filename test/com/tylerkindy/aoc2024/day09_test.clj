@@ -11,3 +11,13 @@
 (deftest parse-input
   (is (= (day09/parse-input example-input)
          example)))
+
+(deftest defrag
+  (is (= (day09/defrag example)
+         [0 0 9 9 8 1 1 1 8 8 8 2 7 7 7 3 3 3 6
+          4 4 6 5 5 5 5 6 6 nil nil nil nil nil
+          nil nil nil nil nil nil nil nil nil])))
+
+(deftest part1
+  (is (= (day09/part1 example)
+         1928)))
