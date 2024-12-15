@@ -21,3 +21,28 @@
 (deftest part1
   (is (= (day09/part1 example)
          1928)))
+
+(deftest open-spaces
+  (is (= (day09/open-spaces example)
+         (list {:start 2, :length 3}
+               {:start 8, :length 3}
+               {:start 12, :length 3}
+               {:start 18, :length 1}
+               {:start 21, :length 1}
+               {:start 26, :length 1}
+               {:start 31, :length 1}
+               {:start 35, :length 1}))))
+
+(deftest swap
+  (is (= (day09/swap [7 8 9 10 11 12 13 14 15 16 17 18] 2 7 3)
+         [7 8 14 15 16 12 13 9 10 11 17 18])))
+
+(deftest defrag-contiguous
+  (is (= (day09/defrag-contiguous example)
+         [0 0 9 9 2 1 1 1 7 7 7 nil 4 4 nil 3 3 3
+          nil nil nil nil 5 5 5 5 nil 6 6 6 6 nil
+          nil nil nil nil 8 8 8 8 nil nil])))
+
+(deftest part2
+  (is (= (day09/part2 example)
+         2858)))
