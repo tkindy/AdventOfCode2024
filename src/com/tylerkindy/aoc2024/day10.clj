@@ -46,6 +46,29 @@
        (map #(score-from % topo))
        (apply +)))
 
+(defn accessible-trails [loc topo]
+  (letfn [(help [loc path]
+            (let [height (height-at loc topo)
+                  path (conj path loc)]
+              (if (= height 9)
+                #{path}
+                (->> (neighbors loc)
+                     (filter #(= (height-at % topo)
+                                 (inc height)))
+                     (map #(help % path))
+                     (apply set/union)))))]
+    (help loc [])))
+
+(defn rating-from [loc topo]
+  (count (accessible-trails loc topo)))
+
+(defn part2 [topo]
+  (->> topo
+       find-trailheads
+       (map #(rating-from % topo))
+       (apply +)))
+
 (defn -main []
   (let [topo (parse-input (slurp "input/day10.txt"))]
-    (println "Part 1:" (part1 topo))))
+    (println "Part 1:" (part1 topo))
+    (println "Part 2:" (part2 topo))))
