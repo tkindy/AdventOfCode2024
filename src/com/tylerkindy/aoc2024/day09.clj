@@ -5,14 +5,13 @@
   (->> input
        str/trim
        (map (comp parse-long str))
-       (reduce (fn [[disk id free?] length]
-                 (let [value (if free? nil id)]
-                   [(vec (concat disk (repeat length value)))
-
-                    (if free? id (inc id))
-                    (not free?)]))
-               [[] 0 false])
-       first))
+       (map-indexed vector)
+       (mapcat (fn [[i length]]
+                 (repeat length
+                         (if (even? i)
+                           (/ i 2)
+                           nil))))
+       vec))
 
 (defn defrag [disk]
   (loop [disk disk
