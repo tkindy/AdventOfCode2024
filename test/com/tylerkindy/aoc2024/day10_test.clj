@@ -20,6 +20,34 @@
               [0 1 3 2 9 8 0 1]
               [1 0 4 5 6 7 3 2]])
 
+(def small-example [[0 1 2 3]
+                    [1 2 3 4]
+                    [8 7 6 5]
+                    [9 8 7 6]])
+
 (deftest parse-input
   (is (= (day10/parse-input example-input)
          example)))
+
+(deftest find-trailheads
+  (is (= (day10/find-trailheads example)
+         #{[2 0] [4 0]
+           [4 2]
+           [6 4]
+           [2 5] [5 5]
+           [0 6] [6 6]
+           [1 7]})))
+
+(deftest score-from
+  (is (= (day10/score-from [0 0] small-example)
+         1))
+
+  (is (= (day10/score-from [2 0] example)
+         5)))
+
+(deftest part1
+  (is (= (day10/part1 small-example)
+         1))
+
+  (is (= (day10/part1 example)
+         36)))
