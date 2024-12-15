@@ -38,13 +38,6 @@
            [0 6] [6 6]
            [1 7]})))
 
-(deftest score-from
-  (is (= (day10/score-from [0 0] small-example)
-         1))
-
-  (is (= (day10/score-from [2 0] example)
-         5)))
-
 (deftest part1
   (is (= (day10/part1 small-example)
          1))

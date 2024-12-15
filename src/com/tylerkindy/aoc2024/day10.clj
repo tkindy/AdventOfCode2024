@@ -27,25 +27,6 @@
   (->> [[0 1] [0 -1] [-1 0] [1 0]]
        (map (partial vec/+ loc))))
 
-(defn accessible-peaks [loc topo]
-  (let [height (height-at loc topo)]
-    (if (= height 9)
-      #{loc}
-      (->> (neighbors loc)
-           (filter #(= (height-at % topo)
-                       (inc height)))
-           (map #(accessible-peaks % topo))
-           (apply set/union)))))
-
-(defn score-from [loc topo]
-  (count (accessible-peaks loc topo)))
-
-(defn part1 [topo]
-  (->> topo
-       find-trailheads
-       (map #(score-from % topo))
-       (apply +)))
-
 (defn accessible-trails [loc topo]
   (letfn [(help [loc path]
             (let [height (height-at loc topo)
@@ -59,13 +40,21 @@
                      (apply set/union)))))]
     (help loc [])))
 
-(defn rating-from [loc topo]
-  (count (accessible-trails loc topo)))
+(defn accessible-peaks [loc topo]
+  (->> (accessible-trails loc topo)
+       (map last)
+       (into #{})))
+
+(defn part1 [topo]
+  (->> topo
+       find-trailheads
+       (map #(count (accessible-peaks % topo)))
+       (apply +)))
 
 (defn part2 [topo]
   (->> topo
        find-trailheads
-       (map #(rating-from % topo))
+       (map #(count (accessible-trails % topo)))
        (apply +)))
 
 (defn -main []
